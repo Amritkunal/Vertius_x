@@ -1,0 +1,1227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sarkathan - E-Commerce Fraud Prevention AI</title>
+    <style>
+        :root {
+            --primary: #2d8a99;
+            --primary-hover: #1d7485;
+            --danger: #c01530;
+            --success: #208a8f;
+            --warning: #a84f2f;
+            --bg: #fcfcf9;
+            --surface: #ffffff;
+            --border: rgba(94, 82, 64, 0.2);
+            --text: #134252;
+            --text-secondary: #627077;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            background: linear-gradient(135deg, #134252 0%, #2d8a99 100%);
+            color: white;
+            padding: 30px 0;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        header h1 {
+            font-size: 32px;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        header p {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            border-bottom: 2px solid var(--border);
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            padding: 12px 24px;
+            background: none;
+            border: none;
+            border-bottom: 3px solid transparent;
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+        .tab-btn.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s;
+        }
+
+        .card:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .card h3 {
+            margin-bottom: 12px;
+            color: var(--text);
+            font-size: 18px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: inherit;
+            transition: border-color 0.3s;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(45, 138, 153, 0.1);
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-block;
+            text-align: center;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-hover);
+        }
+
+        .btn-secondary {
+            background: #f0f0f0;
+            color: var(--text);
+        }
+
+        .btn-secondary:hover {
+            background: #e0e0e0;
+        }
+
+        .btn-full {
+            width: 100%;
+        }
+
+        .risk-score {
+            font-size: 36px;
+            font-weight: bold;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .risk-low {
+            color: var(--success);
+        }
+
+        .risk-medium {
+            color: var(--warning);
+        }
+
+        .risk-high {
+            color: var(--danger);
+        }
+
+        .risk-badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+            margin-top: 10px;
+        }
+
+        .risk-badge.platinum {
+            background: rgba(45, 138, 153, 0.2);
+            color: var(--primary);
+        }
+
+        .risk-badge.red {
+            background: rgba(192, 21, 47, 0.2);
+            color: var(--danger);
+        }
+
+        .risk-badge.neutral {
+            background: rgba(168, 75, 47, 0.2);
+            color: var(--warning);
+        }
+
+        .result-section {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 25px;
+            margin-top: 20px;
+        }
+
+        .result-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border);
+            align-items: center;
+        }
+
+        .result-row:last-child {
+            border-bottom: none;
+        }
+
+        .result-label {
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+
+        .result-value {
+            color: var(--text);
+            font-weight: 500;
+        }
+
+        .metrics {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .metric {
+            background: linear-gradient(135deg, rgba(45, 138, 153, 0.1), rgba(45, 138, 153, 0.05));
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .metric-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--primary);
+            margin-bottom: 5px;
+        }
+
+        .metric-label {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .info-box {
+            background: rgba(45, 138, 153, 0.1);
+            border-left: 4px solid var(--primary);
+            padding: 15px;
+            border-radius: 6px;
+            margin: 15px 0;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .warning-box {
+            background: rgba(192, 21, 47, 0.1);
+            border-left: 4px solid var(--danger);
+            padding: 15px;
+            border-radius: 6px;
+            margin: 15px 0;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .success-box {
+            background: rgba(32, 138, 143, 0.1);
+            border-left: 4px solid var(--success);
+            padding: 15px;
+            border-radius: 6px;
+            margin: 15px 0;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .code-block {
+            background: #f5f5f5;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 15px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            overflow-x: auto;
+            margin: 15px 0;
+            line-height: 1.4;
+            color: #333;
+        }
+
+        .table-responsive {
+            overflow-x: auto;
+            margin: 20px 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: var(--surface);
+        }
+
+        th {
+            background: rgba(45, 138, 153, 0.1);
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+            border-bottom: 2px solid var(--border);
+        }
+
+        td {
+            padding: 12px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        tr:hover {
+            background: rgba(45, 138, 153, 0.05);
+        }
+
+        .section-title {
+            font-size: 22px;
+            font-weight: 600;
+            margin: 25px 0 15px 0;
+            color: var(--text);
+        }
+
+        .workflow-step {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: var(--surface);
+            border-left: 4px solid var(--primary);
+            border-radius: 8px;
+        }
+
+        .workflow-number {
+            background: var(--primary);
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+
+        .workflow-content h4 {
+            margin-bottom: 5px;
+            color: var(--text);
+        }
+
+        .workflow-content p {
+            margin: 0;
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 24px;
+            }
+
+            .tabs {
+                flex-direction: column;
+            }
+
+            .grid {
+                grid-template-columns: 1fr;
+            }
+
+            .tab-btn {
+                padding: 10px 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>🛡️ Sarkathan</h1>
+            <p>AI-Powered E-Commerce Fraud Prevention & Return Management System</p>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="tabs">
+            <button class="tab-btn active" onclick="switchTab('overview')">Overview</button>
+            <button class="tab-btn" onclick="switchTab('user-risk')">User Risk Analysis</button>
+            <button class="tab-btn" onclick="switchTab('return-policy')">Return Policy Engine</button>
+            <button class="tab-btn" onclick="switchTab('cod-pricing')">COD Pricing Strategy</button>
+            <button class="tab-btn" onclick="switchTab('docs')">Documentation</button>
+        </div>
+
+        <!-- OVERVIEW TAB -->
+        <div id="overview" class="tab-content active">
+            <h2 class="section-title">System Overview</h2>
+            <p style="margin-bottom: 20px; color: var(--text-secondary);">Sarkathan is an intelligent fraud prevention system designed specifically for e-commerce platforms. It combines AI-driven user risk profiling with smart return policies to reduce fraudulent COD orders and optimize return rates.</p>
+
+            <div class="grid">
+                <div class="card">
+                    <h3>📊 User Risk Profiling</h3>
+                    <p style="font-size: 14px; color: var(--text-secondary); margin-bottom: 15px;">Automatic classification of users into Platinum (trusted) or Red (risky) categories based on behavioral analysis.</p>
+                    <button class="btn btn-secondary btn-full" onclick="switchTab('user-risk')">Analyze User</button>
+                </div>
+
+                <div class="card">
+                    <h3>🔄 Smart Return Policy</h3>
+                    <p style="font-size: 14px; color: var(--text-secondary); margin-bottom: 15px;">Dynamic return eligibility based on product rating and user history. Higher-rated products have easier returns.</p>
+                    <button class="btn btn-secondary btn-full" onclick="switchTab('return-policy')">Check Return Policy</button>
+                </div>
+
+                <div class="card">
+                    <h3>💰 COD Pricing Strategy</h3>
+                    <p style="font-size: 14px; color: var(--text-secondary); margin-bottom: 15px;">Intelligent COD pricing based on user risk profile. Premium users get discounted COD, risky users pay premium rates.</p>
+                    <button class="btn btn-secondary btn-full" onclick="switchTab('cod-pricing')">Calculate COD Fee</button>
+                </div>
+            </div>
+
+            <div class="info-box">
+                <strong>🎯 Key Benefits:</strong><br>
+                • Reduce COD fraud by 60-75% through user profiling<br>
+                • Optimize return rates with dynamic policies<br>
+                • Increase profitability through risk-based pricing<br>
+                • Improve customer satisfaction for loyal users
+            </div>
+
+            <h3 class="section-title">How It Works</h3>
+
+            <div class="workflow-step">
+                <div class="workflow-number">1</div>
+                <div class="workflow-content">
+                    <h4>User Registration & Profiling</h4>
+                    <p>New users start with a default risk profile. AI analyzes purchase history, return patterns, payment method, and verification status.</p>
+                </div>
+            </div>
+
+            <div class="workflow-step">
+                <div class="workflow-number">2</div>
+                <div class="workflow-content">
+                    <h4>Dynamic User Classification</h4>
+                    <p>Users are classified as Platinum (low-risk) or Red (high-risk) based on multiple behavioral factors and transaction patterns.</p>
+                </div>
+            </div>
+
+            <div class="workflow-step">
+                <div class="workflow-number">3</div>
+                <div class="workflow-content">
+                    <h4>COD Eligibility & Pricing</h4>
+                    <p>Platinum users get COD access with reduced fees. Red users face restrictions or premium pricing to offset fraud risk.</p>
+                </div>
+            </div>
+
+            <div class="workflow-step">
+                <div class="workflow-number">4</div>
+                <div class="workflow-content">
+                    <h4>Return Policy Application</h4>
+                    <p>Return eligibility depends on product rating and user profile. 4+ star products have flexible returns; below 3 stars are strict.</p>
+                </div>
+            </div>
+
+            <div class="workflow-step">
+                <div class="workflow-number">5</div>
+                <div class="workflow-content">
+                    <h4>Continuous Learning</h4>
+                    <p>AI model continuously updates based on transaction outcomes, improving accuracy and adaptability over time.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- USER RISK ANALYSIS TAB -->
+        <div id="user-risk" class="tab-content">
+            <h2 class="section-title">User Risk Analysis</h2>
+            
+            <div class="card">
+                <h3>Analyze User Risk Profile</h3>
+
+                <div class="form-group">
+                    <label>User ID / Email:</label>
+                    <input type="text" id="userIdInput" placeholder="user@example.com">
+                </div>
+
+                <div class="form-group">
+                    <label>Total Orders Completed:</label>
+                    <input type="number" id="ordersCompleted" placeholder="5" min="0">
+                </div>
+
+                <div class="form-group">
+                    <label>Total Returns (%):</label>
+                    <input type="number" id="returnRate" placeholder="20" min="0" max="100">
+                </div>
+
+                <div class="form-group">
+                    <label>Average Review Rating (1-5):</label>
+                    <input type="number" id="reviewRating" placeholder="4.2" min="1" max="5" step="0.1">
+                </div>
+
+                <div class="form-group">
+                    <label>Payment Method Used:</label>
+                    <select id="paymentMethod">
+                        <option value="credit_card">Credit Card</option>
+                        <option value="debit_card">Debit Card</option>
+                        <option value="cod">Cash on Delivery</option>
+                        <option value="upi">UPI/Digital Wallet</option>
+                        <option value="net_banking">Net Banking</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Account Age (Months):</label>
+                    <input type="number" id="accountAge" placeholder="12" min="0">
+                </div>
+
+                <div class="form-group">
+                    <label>Chargeback Count:</label>
+                    <input type="number" id="chargebacks" placeholder="0" min="0">
+                </div>
+
+                <div class="form-group">
+                    <label>Address Verification Status:</label>
+                    <select id="addressVerified">
+                        <option value="verified">Verified</option>
+                        <option value="partial">Partially Verified</option>
+                        <option value="unverified">Unverified</option>
+                    </select>
+                </div>
+
+                <button class="btn btn-primary btn-full" onclick="analyzeUserRisk()">Analyze Risk</button>
+            </div>
+
+            <div id="userRiskResult"></div>
+        </div>
+
+        <!-- RETURN POLICY TAB -->
+        <div id="return-policy" class="tab-content">
+            <h2 class="section-title">Return Policy Engine</h2>
+            
+            <div class="card">
+                <h3>Check Return Eligibility</h3>
+
+                <div class="form-group">
+                    <label>Product Rating (1-5 stars):</label>
+                    <input type="number" id="productRating" placeholder="4.5" min="1" max="5" step="0.1">
+                </div>
+
+                <div class="form-group">
+                    <label>User Risk Level:</label>
+                    <select id="userRiskLevel">
+                        <option value="platinum">Platinum (Low Risk)</option>
+                        <option value="neutral">Neutral (Medium Risk)</option>
+                        <option value="red">Red (High Risk)</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Days Since Purchase:</label>
+                    <input type="number" id="daysSincePurchase" placeholder="5" min="0" max="30">
+                </div>
+
+                <div class="form-group">
+                    <label>Return Reason:</label>
+                    <select id="returnReason">
+                        <option value="defective">Defective/Damaged</option>
+                        <option value="wrong_item">Wrong Item Received</option>
+                        <option value="not_as_described">Not as Described</option>
+                        <option value="changed_mind">Changed Mind</option>
+                        <option value="better_price">Found Better Price</option>
+                    </select>
+                </div>
+
+                <button class="btn btn-primary btn-full" onclick="checkReturnPolicy()">Check Eligibility</button>
+            </div>
+
+            <div id="returnPolicyResult"></div>
+        </div>
+
+        <!-- COD PRICING TAB -->
+        <div id="cod-pricing" class="tab-content">
+            <h2 class="section-title">COD Pricing Strategy</h2>
+            
+            <div class="card">
+                <h3>Calculate COD Fee</h3>
+
+                <div class="form-group">
+                    <label>Order Amount (₹):</label>
+                    <input type="number" id="orderAmount" placeholder="1500" min="0" step="0.01">
+                </div>
+
+                <div class="form-group">
+                    <label>User Risk Profile:</label>
+                    <select id="userRiskProfile">
+                        <option value="platinum">Platinum (Trusted)</option>
+                        <option value="neutral">Neutral (Average)</option>
+                        <option value="red">Red (Risky)</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>User's Return History (%):</label>
+                    <input type="number" id="userReturnHistory" placeholder="5" min="0" max="100">
+                </div>
+
+                <div class="form-group">
+                    <label>Number of Past Cancellations:</label>
+                    <input type="number" id="cancellations" placeholder="0" min="0">
+                </div>
+
+                <button class="btn btn-primary btn-full" onclick="calculateCODPricing()">Calculate COD Fee</button>
+            </div>
+
+            <div id="codPricingResult"></div>
+
+            <div class="info-box" style="margin-top: 30px;">
+                <strong>📋 COD Fee Structure:</strong><br>
+                <strong>Platinum Users:</strong> 0-1% base fee (lowest fraud risk)<br>
+                <strong>Neutral Users:</strong> 1-3% standard fee (medium fraud risk)<br>
+                <strong>Red Users:</strong> 4-6% premium fee (high fraud risk)<br><br>
+                Additional multipliers apply based on return history and cancellation patterns.
+            </div>
+        </div>
+
+        <!-- DOCUMENTATION TAB -->
+        <div id="docs" class="tab-content">
+            <h2 class="section-title">System Documentation</h2>
+
+            <h3 style="margin-top: 25px; margin-bottom: 15px; font-size: 18px;">API Endpoints</h3>
+
+            <h4 style="margin-top: 20px; margin-bottom: 10px; color: var(--primary); font-size: 16px;">1. User Risk Assessment</h4>
+            <div class="code-block">
+POST /api/users/risk-assessment
+Content-Type: application/json
+
+{
+  "userId": "user123",
+  "ordersCompleted": 15,
+  "returnRate": 8,
+  "averageRating": 4.5,
+  "paymentMethod": "credit_card",
+  "accountAge": 24,
+  "chargebacks": 0,
+  "addressVerified": "verified"
+}
+
+Response:
+{
+  "userId": "user123",
+  "riskScore": 85,
+  "riskLevel": "platinum",
+  "confidence": 0.94,
+  "metrics": {
+    "orderReliability": 95,
+    "reviewAccuracy": 90,
+    "paymentTrustworthiness": 95,
+    "verificationScore": 100
+  }
+}
+            </div>
+
+            <h4 style="margin-top: 20px; margin-bottom: 10px; color: var(--primary); font-size: 16px;">2. Return Policy Evaluation</h4>
+            <div class="code-block">
+POST /api/returns/check-eligibility
+Content-Type: application/json
+
+{
+  "productRating": 4.5,
+  "userRiskLevel": "platinum",
+  "daysSincePurchase": 7,
+  "returnReason": "defective"
+}
+
+Response:
+{
+  "eligible": true,
+  "policy": {
+    "returnWindow": 30,
+    "processingTime": 3,
+    "refundPercentage": 100,
+    "requiresVerification": false
+  }
+}
+            </div>
+
+            <h4 style="margin-top: 20px; margin-bottom: 10px; color: var(--primary); font-size: 16px;">3. COD Pricing</h4>
+            <div class="code-block">
+POST /api/cod/calculate-fee
+Content-Type: application/json
+
+{
+  "orderAmount": 2500,
+  "userRiskProfile": "platinum",
+  "returnHistory": 5,
+  "cancellations": 0
+}
+
+Response:
+{
+  "orderAmount": 2500,
+  "codFeePercentage": 1.0,
+  "codFeeAmount": 25,
+  "totalAmount": 2525,
+  "eligibleForCOD": true,
+  "reason": "Platinum user with low risk profile"
+}
+            </div>
+
+            <h3 style="margin-top: 30px; margin-bottom: 15px; font-size: 18px;">Algorithm Details</h3>
+
+            <h4 style="margin-top: 20px; margin-bottom: 10px; color: var(--primary); font-size: 16px;">Risk Score Calculation</h4>
+            <p style="margin-bottom: 10px; color: var(--text-secondary);">The risk score is calculated using a weighted formula combining multiple behavioral factors:</p>
+            <div class="code-block">
+Risk Score = (Order Reliability × 0.35) + 
+             (Review Accuracy × 0.25) + 
+             (Payment Trustworthiness × 0.25) + 
+             (Account Maturity × 0.15)
+
+Classifications:
+- Score 80-100: PLATINUM (Trusted User)
+- Score 50-79: NEUTRAL (Average User)
+- Score 0-49: RED (Risky User)
+            </div>
+
+            <h4 style="margin-top: 20px; margin-bottom: 10px; color: var(--primary); font-size: 16px;">Return Policy Logic</h4>
+            <div class="code-block">
+IF productRating >= 4.0:
+    IF userRiskLevel == "platinum":
+        - Return Window: 30 days
+        - Refund: 100%
+        - Verification: Not required
+    ELSE IF userRiskLevel == "neutral":
+        - Return Window: 14 days
+        - Refund: 95-100%
+        - Verification: Required for high values
+    ELSE (Red user):
+        - Return Window: 7 days
+        - Refund: 80-90%
+        - Verification: Always required
+
+ELSE IF productRating < 3.0:
+    IF userRiskLevel == "platinum" AND validReason:
+        - Allow return with verification
+    ELSE:
+        - Reject or require escalation
+            </div>
+
+            <h4 style="margin-top: 20px; margin-bottom: 10px; color: var(--primary); font-size: 16px;">COD Fee Calculation</h4>
+            <div class="code-block">
+Base Fee = {
+  "platinum": 0.5-1.0%,
+  "neutral": 1.5-3.0%,
+  "red": 4.0-6.0%
+}
+
+Risk Multiplier = 1 + (returnHistory/100) + (cancellations × 0.5)
+
+Final Fee = Base Fee × Risk Multiplier
+
+Capped at 6% for any user
+            </div>
+
+            <h3 style="margin-top: 30px; margin-bottom: 15px; font-size: 18px;">Data Requirements</h3>
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Data Point</th>
+                            <th>Type</th>
+                            <th>Purpose</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Order History</td>
+                            <td>Numeric</td>
+                            <td>Calculate order reliability score</td>
+                        </tr>
+                        <tr>
+                            <td>Return Rate</td>
+                            <td>Percentage</td>
+                            <td>Assess product satisfaction & pattern</td>
+                        </tr>
+                        <tr>
+                            <td>Review Ratings Given</td>
+                            <td>Numeric (1-5)</td>
+                            <td>Evaluate rating accuracy</td>
+                        </tr>
+                        <tr>
+                            <td>Payment Methods</td>
+                            <td>Categorical</td>
+                            <td>Determine payment trustworthiness</td>
+                        </tr>
+                        <tr>
+                            <td>Account Age</td>
+                            <td>Days/Months</td>
+                            <td>Calculate account maturity</td>
+                        </tr>
+                        <tr>
+                            <td>Chargebacks/Disputes</td>
+                            <td>Count</td>
+                            <td>Identify fraudulent behavior</td>
+                        </tr>
+                        <tr>
+                            <td>Address Verification</td>
+                            <td>Boolean/Status</td>
+                            <td>Validate user identity</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h3 style="margin-top: 30px; margin-bottom: 15px; font-size: 18px;">Integration Guide</h3>
+            <p style="margin-bottom: 15px; color: var(--text-secondary);">To integrate Sarkathan into your e-commerce platform:</p>
+
+            <div class="workflow-step">
+                <div class="workflow-number">1</div>
+                <div class="workflow-content">
+                    <h4>Data Collection</h4>
+                    <p>Ensure your backend collects all required user behavioral data as listed above.</p>
+                </div>
+            </div>
+
+            <div class="workflow-step">
+                <div class="workflow-number">2</div>
+                <div class="workflow-content">
+                    <h4>API Integration</h4>
+                    <p>Integrate the REST API endpoints into your checkout, user profile, and return processing flows.</p>
+                </div>
+            </div>
+
+            <div class="workflow-step">
+                <div class="workflow-number">3</div>
+                <div class="workflow-content">
+                    <h4>Policy Implementation</h4>
+                    <p>Apply returned policies and pricing to your payment gateway and return management system.</p>
+                </div>
+            </div>
+
+            <div class="workflow-step">
+                <div class="workflow-number">4</div>
+                <div class="workflow-content">
+                    <h4>Monitoring & Optimization</h4>
+                    <p>Track fraud rates, return patterns, and COD conversion to continuously improve the model.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function switchTab(tabName) {
+            const contents = document.querySelectorAll('.tab-content');
+            contents.forEach(c => c.classList.remove('active'));
+            document.getElementById(tabName).classList.add('active');
+
+            const buttons = document.querySelectorAll('.tab-btn');
+            buttons.forEach(b => b.classList.remove('active'));
+            event.target.classList.add('active');
+        }
+
+        function analyzeUserRisk() {
+            const userId = document.getElementById('userIdInput').value || 'User123';
+            const ordersCompleted = parseFloat(document.getElementById('ordersCompleted').value) || 0;
+            const returnRate = parseFloat(document.getElementById('returnRate').value) || 0;
+            const reviewRating = parseFloat(document.getElementById('reviewRating').value) || 3;
+            const paymentMethod = document.getElementById('paymentMethod').value;
+            const accountAge = parseFloat(document.getElementById('accountAge').value) || 0;
+            const chargebacks = parseFloat(document.getElementById('chargebacks').value) || 0;
+            const addressVerified = document.getElementById('addressVerified').value;
+
+            // Calculate individual scores (0-100)
+            const orderReliability = Math.min(100, (ordersCompleted / 50) * 100);
+            const reviewAccuracy = (reviewRating / 5) * 100;
+            const paymentScore = paymentMethod === 'credit_card' || paymentMethod === 'debit_card' ? 90 : 
+                                paymentMethod === 'upi' ? 85 : 75;
+            const chargebackPenalty = Math.max(0, 100 - (chargebacks * 20));
+            const accountMaturity = Math.min(100, (accountAge / 24) * 100);
+            const addressScore = addressVerified === 'verified' ? 100 : addressVerified === 'partial' ? 60 : 30;
+            const returnPenalty = Math.max(0, 100 - (returnRate * 2));
+
+            // Weighted risk score calculation
+            const riskScore = (orderReliability * 0.20) + 
+                            (reviewAccuracy * 0.15) + 
+                            (paymentScore * 0.15) + 
+                            (chargebackPenalty * 0.20) + 
+                            (accountMaturity * 0.15) + 
+                            (addressScore * 0.10) + 
+                            (returnPenalty * 0.05);
+
+            let riskLevel, riskColor, riskBadgeClass;
+            if (riskScore >= 80) {
+                riskLevel = 'PLATINUM (Trusted)';
+                riskColor = 'risk-low';
+                riskBadgeClass = 'platinum';
+            } else if (riskScore >= 50) {
+                riskLevel = 'NEUTRAL (Average)';
+                riskColor = 'risk-medium';
+                riskBadgeClass = 'neutral';
+            } else {
+                riskLevel = 'RED (High Risk)';
+                riskColor = 'risk-high';
+                riskBadgeClass = 'red';
+            }
+
+            const html = `
+                <div class="result-section">
+                    <h3>Risk Assessment Results</h3>
+                    <div class="risk-score ${riskColor}">${riskScore.toFixed(2)}</div>
+                    <span class="risk-badge ${riskBadgeClass}">${riskLevel}</span>
+                    
+                    <div class="metrics">
+                        <div class="metric">
+                            <div class="metric-value">${orderReliability.toFixed(0)}</div>
+                            <div class="metric-label">Order Reliability</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-value">${reviewAccuracy.toFixed(0)}</div>
+                            <div class="metric-label">Review Accuracy</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-value">${paymentScore.toFixed(0)}</div>
+                            <div class="metric-label">Payment Trust</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-value">${accountMaturity.toFixed(0)}</div>
+                            <div class="metric-label">Account Maturity</div>
+                        </div>
+                    </div>
+
+                    <div class="result-row">
+                        <span class="result-label">User ID:</span>
+                        <span class="result-value">${userId}</span>
+                    </div>
+                    <div class="result-row">
+                        <span class="result-label">Total Orders:</span>
+                        <span class="result-value">${ordersCompleted}</span>
+                    </div>
+                    <div class="result-row">
+                        <span class="result-label">Return Rate:</span>
+                        <span class="result-value">${returnRate}%</span>
+                    </div>
+                    <div class="result-row">
+                        <span class="result-label">Account Age:</span>
+                        <span class="result-value">${accountAge} months</span>
+                    </div>
+                    <div class="result-row">
+                        <span class="result-label">Chargebacks:</span>
+                        <span class="result-value">${chargebacks}</span>
+                    </div>
+                    <div class="result-row">
+                        <span class="result-label">Address Verification:</span>
+                        <span class="result-value">${addressVerified}</span>
+                    </div>
+
+                    ${riskLevel.includes('PLATINUM') ? `
+                        <div class="success-box">
+                            ✅ This is a trustworthy user. Eligible for COD with lowest fees and flexible return policies.
+                        </div>
+                    ` : riskLevel.includes('NEUTRAL') ? `
+                        <div class="info-box">
+                            ℹ️ This user shows average risk. Standard COD fees and return policies apply.
+                        </div>
+                    ` : `
+                        <div class="warning-box">
+                            ⚠️ This user is flagged as high-risk. Consider premium COD fees or require prepayment. Strict return policies recommended.
+                        </div>
+                    `}
+                </div>
+            `;
+
+            document.getElementById('userRiskResult').innerHTML = html;
+        }
+
+        function checkReturnPolicy() {
+            const productRating = parseFloat(document.getElementById('productRating').value) || 3;
+            const userRiskLevel = document.getElementById('userRiskLevel').value;
+            const daysSincePurchase = parseFloat(document.getElementById('daysSincePurchase').value) || 0;
+            const returnReason = document.getElementById('returnReason').value;
+
+            let eligible = false;
+            let policy = {};
+            let explanation = '';
+
+            // Return window logic
+            if (productRating >= 4.0) {
+                if (userRiskLevel === 'platinum') {
+                    policy.returnWindow = 30;
+                    policy.refundPercentage = 100;
+                    policy.requiresVerification = false;
+                    eligible = daysSincePurchase <= 30;
+                    explanation = 'High-rated product with trusted user: Full flexibility.';
+                } else if (userRiskLevel === 'neutral') {
+                    policy.returnWindow = 14;
+                    policy.refundPercentage = 95;
+                    policy.requiresVerification = true;
+                    eligible = daysSincePurchase <= 14;
+                    explanation = 'High-rated product with average user: Standard policy.';
+                } else {
+                    policy.returnWindow = 7;
+                    policy.refundPercentage = 80;
+                    policy.requiresVerification = true;
+                    eligible = daysSincePurchase <= 7 && ['defective', 'wrong_item'].includes(returnReason);
+                    explanation = 'High-rated product with risky user: Strict policy.';
+                }
+            } else {
+                // Below 3 stars
+                if (userRiskLevel === 'platinum' && ['defective', 'wrong_item', 'not_as_described'].includes(returnReason)) {
+                    policy.returnWindow = 15;
+                    policy.refundPercentage = 100;
+                    policy.requiresVerification = false;
+                    eligible = daysSincePurchase <= 15;
+                    explanation = 'Low-rated product with trusted user: Genuine reason accepted.';
+                } else {
+                    policy.returnWindow = 0;
+                    policy.refundPercentage = 0;
+                    policy.requiresVerification = true;
+                    eligible = false;
+                    explanation = 'Low-rated product with non-platinum user: Manual review required.';
+                }
+            }
+
+            policy.processingTime = eligible ? 3 : 0;
+
+            const html = `
+                <div class="result-section">
+                    <h3>Return Eligibility Decision</h3>
+                    <div style="font-size: 24px; font-weight: bold; margin: 20px 0; color: ${eligible ? 'var(--success)' : 'var(--danger)'};">
+                        ${eligible ? '✅ ELIGIBLE' : '❌ NOT ELIGIBLE'}
+                    </div>
+
+                    <div class="result-row">
+                        <span class="result-label">Product Rating:</span>
+                        <span class="result-value">${productRating} stars</span>
+                    </div>
+                    <div class="result-row">
+                        <span class="result-label">User Risk Level:</span>
+                        <span class="result-value">${userRiskLevel.toUpperCase()}</span>
+                    </div>
+                    <div class="result-row">
+                        <span class="result-label">Days Since Purchase:</span>
+                        <span class="result-value">${daysSincePurchase}</span>
+                    </div>
+                    <div class="result-row">
+                        <span class="result-label">Return Reason:</span>
+                        <span class="result-value">${returnReason.replace(/_/g, ' ').toUpperCase()}</span>
+                    </div>
+
+                    <h4 style="margin-top: 20px; margin-bottom: 10px; color: var(--primary);">Policy Details</h4>
+                    <div class="result-row">
+                        <span class="result-label">Return Window:</span>
+                        <span class="result-value">${policy.returnWindow} days</span>
+                    </div>
+                    <div class="result-row">
+                        <span class="result-label">Refund Percentage:</span>
+                        <span class="result-value">${policy.refundPercentage}%</span>
+                    </div>
+                    <div class="result-row">
+                        <span class="result-label">Verification Required:</span>
+                        <span class="result-value">${policy.requiresVerification ? 'Yes' : 'No'}</span>
+                    </div>
+                    <div class="result-row">
+                        <span class="result-label">Processing Time:</span>
+                        <span class="result-value">${policy.processingTime} business days</span>
+                    </div>
+
+                    ${eligible ? `
+                        <div class="success-box">
+                            ✅ Return Approved<br>
+                            ${explanation}
+                        </div>
+                    ` : `
+                        <div class="warning-box">
+                            ⚠️ Return Not Eligible<br>
+                            ${explanation} Please escalate to support for manual review.
+                        </div>
+                    `}
+                </div>
+            `;
+
+            document.getElementById('returnPolicyResult').innerHTML = html;
+        }
+
+        function calculateCODPricing() {
+            const orderAmount = parseFloat(document.getElementById('orderAmount').value) || 0;
+            const userRiskProfile = document.getElementById('userRiskProfile').value;
+            const returnHistory = parseFloat(document.getElementById('userReturnHistory').value) || 0;
+            const cancellations = parseFloat(document.getElementById('cancellations').value) || 0;
+
+            // Base COD fee by risk profile
+            let baseFeePercent;
+            if (userRiskProfile === 'platinum') {
+                baseFeePercent = 0.75;
+            } else if (userRiskProfile === 'neutral') {
+                baseFeePercent = 2.0;
+            } else {
+                baseFeePercent = 5.0;
+            }
+
+            // Risk multiplier based on history
+            let multiplier = 1 + (returnHistory / 100) + (cancellations * 0.3);
+            
+            // Cap multiplier at reasonable level
+            multiplier = Math.min(multiplier, 1.8);
+
+            let finalFeePercent = baseFeePercent * multiplier;
+            finalFeePercent = Math.min(finalFeePercent, 6.0); // Cap at 6%
+
+            const codFeeAmount = (orderAmount * finalFeePercent) / 100;
+            const totalAmount = orderAmount + codFeeAmount;
+
+            let eligibility = 'Eligible';
+            let eligibilityReason = '';
+            
+            if (userRiskProfile === 'platinum') {
+                eligibility = 'Eligible';
+                eligibilityReason = 'Platinum user with excellent track record.';
+            } else if (userRiskProfile === 'neutral') {
+                eligibility = 'Eligible';
+                eligibilityReason = 'Eligible with standard COD fees.';
+            } else {
+                if (cancellations > 2) {
+                    eligibility = 'Restricted';
+                    eligibilityReason = 'High cancellation history. Limited COD access.';
+                } else {
+                    eligibility = 'Eligible';
+                    eligibilityReason = 'High-risk user but eligible with premium fees.';
+                }
+            }
+
+            const html = `
+                <div class="result-section">
+                    <h3>COD Pricing Calculation</h3>
+
+                    <div class="result-row">
+                        <span class="result-label">Order Amount (₹):</span>
+                        <span class="result-value">₹ ${orderAmount.toFixed(2)}</span>
+                    </div>
+                    <div class="result-row">
+                        <span class="result-label">User Risk Profile:</span>
+                        <span class="result-value">${userRiskProfile.toUpperCase()}</span>
+                    </div>
+                    <div class="result-row">
+                        <span class="result-label">Base COD Fee (%):</span>
+                        <span class="result-value">${baseFeePercent.toFixed(2)}%</span>
+                    </div>
+                    <div class="result-row">
+                        <span class="result-label">Risk Multiplier:</span>
+                        <span class="result-value">${multiplier.toFixed(2)}x</span>
+                    </div>
+                    <div class="result-row">
+                        <span class="result-label">Final COD Fee (%):</span>
+                        <span class="result-value" style="color: var(--danger); font-weight: bold;">${finalFeePercent.toFixed(2)}%</span>
+                    </div>
+
+                    <h4 style="margin-top: 20px; margin-bottom: 10px; color: var(--primary);">Final Amount</h4>
+                    <div class="result-row">
+                        <span class="result-label">COD Fee Amount (₹):</span>
+                        <span class="result-value">₹ ${codFeeAmount.toFixed(2)}</span>
+                    </div>
+                    <div class="result-row">
+                        <span class="result-label">Total Amount (₹):</span>
+                        <span class="result-value" style="font-size: 18px; color: var(--primary); font-weight: bold;">₹ ${totalAmount.toFixed(2)}</span>
+                    </div>
+                    <div class="result-row">
+                        <span class="result-label">COD Eligibility:</span>
+                        <span class="result-value">${eligibility}</span>
+                    </div>
+
+                    ${eligibility === 'Eligible' ? `
+                        <div class="success-box">
+                            ✅ ${eligibilityReason}
+                        </div>
+                    ` : `
+                        <div class="warning-box">
+                            ⚠️ ${eligibilityReason}
+                        </div>
+                    `}
+
+                    <h4 style="margin-top: 20px; margin-bottom: 10px; color: var(--primary);">User History Analysis</h4>
+                    <div class="result-row">
+                        <span class="result-label">Return History (%):</span>
+                        <span class="result-value">${returnHistory}%</span>
+                    </div>
+                    <div class="result-row">
+                        <span class="result-label">Cancellations:</span>
+                        <span class="result-value">${cancellations}</span>
+                    </div>
+                    <div class="result-row">
+                        <span class="result-label">Risk Assessment:</span>
+                        <span class="result-value">${cancellations > 2 ? '⚠️ High Risk' : returnHistory > 20 ? '⚠️ Medium Risk' : '✅ Low Risk'}</span>
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('codPricingResult').innerHTML = html;
+        }
+    </script>
+</body>
+</html>
